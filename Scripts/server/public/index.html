@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>행태분석 정책 설정</title>
+  <link rel="icon" href="favicon.ico">
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-size: 16px;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+
+    #policy-json {
+      width: 100%;
+      height: 100%;
+      border: 1px solid #ccc;
+      padding: 8px;
+      box-sizing: border-box;
+      white-space: pre-wrap;
+      overflow: auto;
+    }
+
+    .btn__remove {
+      margin-left: 8px;
+      cursor: pointer;
+    }
+
+    h2 {
+      margin: 16px 0;
+    }
+
+    h3 {
+      margin: 12px 0;
+    }
+
+    h4 {
+      margin: 8px 0;
+    }
+
+    .string {
+      color: #4caf50;
+    }
+
+    .number {
+      color: #ff9200;
+    }
+
+    .boolean {
+      color: #4a5ea3;
+    }
+
+    .null {
+      color: #ff5454;
+    }
+
+    .key {
+      color: #000;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div style="height: 100%;">
+      <header>
+        <div style="height: 60px;line-height: 60px;display: flex;align-items: center;padding: 0 20px;">
+          <span style="float:left;font-size: 20px;">행태분석 정책 관리</span>
+          <button style="margin-left: auto;padding: 0 36px;height: 36px;" @click="writeConfig">저장</button>
+        </div>
+      </header>
+      <div style="height: calc(100% - 60px);display: flex;flex-direction: row;flex-wrap: wrap;width: 100%;">
+        <div
+          style="height: 100%;flex-basis: 50%;padding: 20px 10px 20px 20px;box-sizing: border-box;display: flex;flex-direction: column;">
+          <div id="policy-json" v-html="getPolicyDataJson">
+          </div>
+        </div>
+        <div style="flex-basis: 50%;padding: 20px 20px 20px 10px;box-sizing: border-box;height: 100%;">
+          <div style="height: 100%;border: 1px solid #ccc;padding: 8px;box-sizing: border-box;overflow: auto;"
+            v-if="policyData">
+            <h2 style="margin-top: 0">감시 설정</h2>
+            <div>
+              <label>감시 주기 설정 (ms): <input type="number" v-model.number="policyData.watching.interval"></label>
+            </div>
+            <div>
+              <h3>자리 비움 감시</h3>
+              <div>
+                <label>자리비움 감시 사용: <input type="checkbox" v-model=" policyData.watching.idle.enabled"></label>
+              </div>
+              <div>
+                <label>자리비움 시작 시간 (ms): <input type="number" v-model.number="policyData.watching.idle.in"></label>
+              </div>
+              <div>
+                <label>자리비움 해제 최소 대기 시간 (ms): <input type="number"
+                    v-model.number="policyData.watching.idle.awake"></label>
+              </div>
+            </div>
+            <div>
+              <h3>프로세스 감시</h3>
+              <div>
+                <label>프로세스 감시 사용: <input type="checkbox" v-model=" policyData.watching.process.enabled"></label>
+              </div>
+              <list title="브라우저 프로세스 정의" :data-list="policyData.watching.process.browsers"></list>
+              <list title="감시 예외 프로세스 정의" :data-list="policyData.watching.process.excludes"></list>
+              <list title="사생활 보호 프로세스 정의" :data-list="policyData.watching.process.privates"></list>
+              <list title="캡션 중복 방지 프로세스 정의" :data-list="policyData.watching.process.preventCaptionDuplicate"></list>
+            </div>
+            <div>
+              <h3>파일 IO 감시</h3>
+              <div>
+                <label>파일 IO 감시 사용: <input type="checkbox" v-model=" policyData.watching.fileIo.enabled"></label>
+              </div>
+              <list title="감시 예외 경로 정의" :data-list="policyData.watching.fileIo.excludes"></list>
+              <list title="감시 대상 확장자명 정의" :data-list="policyData.watching.fileIo.extensions"></list>
+            </div>
+            <div>
+              <h3>프린트 출력 감시</h3>
+              <div>
+                <label>프린트 출력 감시 사용: <input type="checkbox" v-model=" policyData.watching.print.enabled"></label>
+              </div>
+            </div>
+            <div style="margin-top: 16px;border-top: 1px solid #cecece;width: 100%;"></div>
+            <h2>이상 탐지 설정</h2>
+            <div>
+              <label>이상 탐지 사용: <input type="checkbox" v-model=" policyData.detection.enabled"></label>
+            </div>
+            <div>
+              <label>이상 탐지 실행 주기 (ms): <input type="number" v-model.number="policyData.detection.interval"></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/lib/vue.js"></script>
+  <script src="js/lib/axios.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>

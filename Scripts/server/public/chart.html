@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사용자 이상행위 탐지 모델 시각화 차트</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-size: 16px;
+    }
+
+    body {
+      background: #333;
+      box-sizing: border-box;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+
+    .chart-wrap {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .chart-wrap .top-toolbar {
+      width: 100%;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .chart-wrap .top-toolbar .title {
+      color: #fff;
+      font-size: 24px;
+      font-weight: normal;
+    }
+
+    .chart-wrap .top-toolbar #user-id {
+      margin-left: auto;
+    }
+
+    .chart-wrap .chart-content {
+      width: 100%;
+      height: calc(100% - 52px);
+    }
+
+    .chart-wrap-inner {
+      height: 50%;
+      padding: 20px;
+      box-sizing: border-box;
+      float: left;
+    }
+
+    .chart-title {
+      color: #c3c3c3;
+      font-weight: bold;
+      height: 60px;
+      line-height: 60px;
+    }
+
+    .chart-wrap-inner div:not(.chart-title) {
+      position: relative;
+      height: calc(100% - 60px);
+      box-sizing: border-box;
+    }
+
+    .chart-wrap-inner div:not(.chart-title) canvas {
+      height: 100% !important;
+    }
+
+    #ab-detection-chart {
+      width: 100%;
+    }
+
+    #act-chart {
+      width: 30%;
+    }
+
+    #date-act-chart {
+      width: 70%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="chart-wrap" v-if="chartData">
+      <div class="top-toolbar">
+        <h1 class="title">Intelligent User Abnormally Detection Model</h1>
+        <select name="user-id" id="user-id" v-model="currentUser">
+          <option v-for="item in chartData.userList" :key="item" :value="item">{{ item }}</option>
+        </select>
+      </div>
+      <div class="chart-content">
+        <div id="ab-detection-chart" class="chart-wrap-inner">
+          <div class="chart-title">
+            Act.Statistics
+          </div>
+          <abnormal-detect-chart :chart-data="getChartDataByUser.abnormalDetectData"></abnormal-detect-chart>
+        </div>
+        <div id="act-chart" class="chart-wrap-inner">
+          <div class="chart-title">
+            Act.Statistics
+          </div>
+          <act-chart :chart-data="getChartDataByUser.actData"></act-chart>
+        </div>
+        <div id="date-act-chart" class="chart-wrap-inner">
+          <div class="chart-title">
+            Act.Statistics
+          </div>
+          <date-act-chart :chart-data="getChartDataByUser.dateActData"></date-act-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/lib/vue.js"></script>
+  <script type="text/javascript" src="js/lib/axios.min.js"></script>
+  <script type="text/javascript" src="js/lib/moment.min.js"></script>
+  <script type="text/javascript" src="js/lib/chartjs.min.js"></script>
+  <script type="text/javascript" src="js/lib/vue-chartjs.min.js"></script>
+  <script src="js/chart.js"></script>
+</body>
+
+</html>
