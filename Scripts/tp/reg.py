@@ -98,6 +98,15 @@ accountConfig = '''
 
 '''
 
+re1 = r'\s?\d{3}[-]\d{5}[-]\d{3}'
+re2 = r'\s?\d{3}[-]\d{6}[-]\d{5}'
+re3 = r'\s?\d{3}[-]\d{2}[-]\d{5}[-]\d{1}'
+re4 = r'\s?\d{3}[-]\d{4}[-]\d{4}[-]\d{3}'
+ 
+generic_re = re.compile("(%s|%s|%s|%s)" % (re1, re2, re3, re4)).findall("111-22222-333 111-222222-33333 111-22-33333-4 111-2222-3333-444")
+print(generic_re)
+
+
 # IP 주소
 ipAddressRegex = re.compile(r'''(
     (\d{1,3})
@@ -161,7 +170,6 @@ docRegex = re.compile(r'''(
 )''', re.VERBOSE)
 
 
-
 # 위 정규식 통합 Dictionary
 dic_reg = {
     'E-mail': emailRegex,
@@ -182,19 +190,19 @@ dic_reg = {
 
 # Dictionary로 KEY List 생성
 reg_list = list(dic_reg.keys())
-1
+
 
 def extract_all(text):
     for i in range(0, len(reg_list)):
         for regex in dic_reg[reg_list[i]].findall(text):
-                print(reg_list[i] + ' : ' + str(regex))
+            print(reg_list[i] + ' : ' + str(regex))
 
 
 
 
 if __name__ == "__main__":
     msg = 'rain@naver.com  010-3322-2233 s.zip'
-    extract_all(msg)
+    # extract_all(msg)
 
 
     # x = '3~4개월'
