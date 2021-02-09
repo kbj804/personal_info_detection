@@ -5,168 +5,284 @@ import numpy as np
 
 start = time.time()
 
-accountRegex1 = re.compile(r'''(
+# 지역별 전화번호
+# 02서울 / 031경기 / 032인천 / 033강원 / 041충남 / 042대전 / 043충북 / 051부산 / 052울산 / 053대구 / 054경북 / 055경남 / 061전남 / 062광주 / 063전북 / 064제주
+localphoneRegex = re.compile(r'''(
+    (\()?           # 괄호 있거나 없거나
+    [0]{1}          # 맨 앞 1
+    [2-6]{1}        # 지역번호 두번째 자리 2~6
+    ([1-5]{1})?     # 지역번호 세번째 자리 1~5 (있거나 없거나)
+    (\))?           
+    (\W)?           # 숫자나 문자가 아닌 특수기호가 있거나 없거나(공백포함)
+    (\d{3}|\d{4})   
+    (\W)            # 이거까지 '?'를 붙이면 왠만한 숫자는 전부 전화번호로 찾아버림..
+    ([0-9]{4})
+    )''', re.VERBOSE)  
+
+# 휴대폰 번호
+phoneRegex = re.compile(r'''(
+    ([01]{2})
+    ([0|1|6|7|9]{1})
+    (\W)?
+    ([0-9]{3,4})
+    (\W)?
+    ([0-9]{4})
+    )''', re.VERBOSE)
+
+# 이메일
+emailRegex = re.compile(r'''(  
+    ([a-zA-Z0-9._%+-]+)      # 사용자명   
+    @                        # @  
+    ([a-zA-Z0-9.-]+)         # 도메인 이름  
+    (\.[a-zA-Z]{2,4})        # 최상위 도메인  
+    )''', re.VERBOSE)  
+
+# 주민등록번호
+registNumberRegex = re.compile(r'''(
+    (\d{2})         # YY
+    ([0-1]{1})      # MM 앞자리 0 ~ 1
+    ([0-9]{1})      # MM 뒷자리
+    ([0-3]{1})      # DD 앞자리 0 ~ 3
+    ([0-9]{1})      # DD 뒷자리
+    (\s)?
+    [-]           # 하이푼
+    (\s)?
+    ([1-4]{1})      # 뒷자리 시작 1~4
+    (\d{6})
+    )''', re.VERBOSE)
+
+# 신용카드
+# 시작번호에 따른 카드 종류 (3:아메리칸익스프레스,JBC카드 등 / 4: 비자카드 / 5: 마스터카드 / 6: 중국은련카드 / 9: 각 국가 내에서 사용하는 카드번호)
+creditcardRegex = re.compile(r'''(
+    ([3-6]{1}|[9]{1})
     (\d{3})
-    -
-    (\d{5})
-    -
-    (\d{3})
+    ([-]\d{4}[-]\d{4}[-]\d{4})
 )''', re.VERBOSE)
 
-accountRegex2 = re.compile(r'''(
+# 계좌번호
+accountRegex = re.compile(r'''(
     (\d{3})
     -
     (\d{6})
     -
-    (\d{5})
-)''', re.VERBOSE)
-
-accountRegex3 = re.compile(r'''(
-    (\d{3})
-    -
     (\d{2})
     -
-    (\d{5})
-    -
-    (\d{1})
+    (\d{3})
 )''', re.VERBOSE)
 
-accountRegex4 = re.compile(r'''(
-    (\d{3})
-    -
-    (\d{4})
-    -
-    (\d{4})
-    -
-    (\d{3})
+accountConfig = '''
+# 기업은행 / 우리은행
+\d{3}[-]\d{6}[-]\d{2}[-]\d{3}
+
+# 경남은행
+\d{3}[-]\d{2}[-]\d{7}
+
+# 국민은행
+\d{6}[-]\d{2}[-]\d{6}
+
+# 농협은행 / 신한은행 / 제일은행
+\d{3}[-]\d{2}[-]\d{6}
+
+# 대구은행
+\d{3}[-]\d{2}[-]\d{6}[-]\d{1}
+
+# 부산은행
+\d{3}[-]\d{2}[-]\d{2}[-]\d{4}[-]\d{1}
+
+# 산업은행
+\d{3}[-]\d{4}[-]\d{4}[-]\d{3}
+
+# 외환은행
+\d{3}[-]\d{2}[-]\d{5}[-]\d{1}
+
+# 하나은행
+\d{3}[-]\d{6}[-]\d{5}
+
+# 한미은행
+\d{3}[-]\d{5}[-]\d{3}
+
+'''
+ 
+# IP 주소
+ipAddressRegex = re.compile(r'''(
+    (\d{1,3})
+    [.]
+    (\d{1,3})
+    [.]
+    (\d{1,3})
+    [.]
+    (\d{1,3})
+)''', re.VERBOSE)
+
+# MAC 주소
+macAddressRegex = re.compile(r'''(
+    ([0-9A-F]{2}[:-]){5}
+    ([0-9A-F]{2})
+)''', re.VERBOSE)
+
+
+# 여권 번호
+# T 여행자증명서, M 복수여권, S 단수여권, R 거주여권, G 공무원 관용여권, D 외교관 여권
+passportRegex = re.compile(r'''(
+    ([T|M|S|R|G|D|t|m|s|r|g|d])
+    (\d{8})
+)''', re.VERBOSE)
+
+# 운전면허 번호 (2014년 이전 이후)
+# 서울 11, 경기 13, 가원 14, 충북 15, 충남 16, 전북 17, 광주전남 18, 경북 19, 경남 20, 제주 21, 대구 22, 인천 23, 대전 25, 울산 26
+driverLicenseRegex = re.compile(r'''(
+    ([1-2]{1}\d{1}|서울|경기|강원|충북|충남|전북|광주전남|경북|경남|제주|대구|인천|대전|울산)
+    ([-])
+    (\d{2}[-])
+    (\d{6}[-])
+    (\d{2})
+)''', re.VERBOSE)
+
+# 건강보험번호
+healthInsRegex = re.compile(r'''(
+    ([1,2,5,7]{1})      # 1-1900년도에 발금된 지역건강보험 가입자 / 2-2000년도에 발급된 지역건강보험 발급자 / 5-공무원 및 사립학교 가입자 / 7-기타직장건강보험 가입자
+    [-]
+    (\d{10})
+)''', re.VERBOSE)
+
+# 이미지 파일
+imageRegex = re.compile(r'''(
+    (^\w+.(jpg|png|gif|bmp|tif))
+)''', re.VERBOSE)
+
+# 압축파일
+compressionRegex = re.compile(r'''(
+    (\w+.(tar|zip|gzip|alz|egg|iso|7zip))
+)''', re.VERBOSE)
+
+# 오디오파일
+audioRegex = re.compile(r'''(
+    (^\w+.(mp3|wav))
+)''', re.VERBOSE)
+
+# 문서파일
+docRegex = re.compile(r'''(
+    (^\w+.(pdf|rtf|html|xml|csv|txt|ppt|hwp|xlxs|docx|log))
 )''', re.VERBOSE)
 
 
 # 위 정규식 통합 Dictionary
-dic_reg = {
-    'aR1' : accountRegex1,
-    'aR2' : accountRegex2,
-    'aR3' : accountRegex3,
-    'aR4' : accountRegex4
+preComfile_dic = {
+    'E-mail': emailRegex,
+    'Local_PhoneNumber': localphoneRegex,
+    'PhoneNumber': phoneRegex,
+    'ResidentRegistrationNumber': registNumberRegex,
+    'CreditCardNumber':creditcardRegex,
+    'ipAddress':ipAddressRegex,
+    'macAddress':macAddressRegex,
+    'PassportNumber': passportRegex,
+    'DriverLicenseNumber': driverLicenseRegex,
+    'HealthInsuranceCertification' : healthInsRegex,
+    'ImageFile': imageRegex,
+    'CompressionFile': compressionRegex,
+    'AudioFile': audioRegex,
+    'DocumentFile':docRegex
 }
 
 # Dictionary로 KEY List 생성
-reg_list = list(dic_reg.keys())
+preComfile_list = list(preComfile_dic.keys())
 
-def extract_all(text):
-    for i in range(0, len(reg_list)):
-        for regex in dic_reg[reg_list[i]].findall(text):
-            # print(reg_list[i] + ' : ' + str(regex))
-            reg_list[i] + ' : ' + str(regex)
 
-re1 = r'\s?\d{3}[-]\d{5}[-]\d{3}'
+test_dic = {
+    'E-mail': emailRegex,
+    'PhoneNumber': phoneRegex,
+    'ResidentRegistrationNumber': registNumberRegex
+}
+
+test_list = list(test_dic.keys())
+
+
+# colums_list = ['re1','re2','re3','re4']
+
+re1 = r'\d{3}[-]\d{5}[-]\d{3}'
 re2 = r'\s?\d{3}[-]\d{6}[-]\d{5}'
 re3 = r'\s?\d{3}[-]\d{2}[-]\d{5}[-]\d{1}'
 re4 = r'\s?\d{3}[-]\d{4}[-]\d{4}[-]\d{3}'
+
+dic_reg = {
+    'E-mail': r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}',
+    'Local_PhoneNumber': r'(\()?[0]{1}[2-6]{1}([1-5]{1})?(\))?(\W)?(\d{3}|\d{4})(\W)([0-9]{4})',
+    'PhoneNumber': r'[01]{2}[0|1|6|7|9]{1}\W?[0-9]{3,4}\W?[0-9]{4}',
+    'ResidentRegistrationNumber': r'\d{2}[0-1]{1}[0-9]{1}[0-3]{1}[0-9]{1}\s?[-]\s?[1-4]{1}\d{6}',
+    'CreditCardNumber':r'([3-6]{1}|[9]{1})(\d{3})([-]\d{4}[-]\d{4}[-]\d{4})',
+    'ipAddress':r'(\d{1,3})[.](\d{1,3})[.](\d{1,3})[.](\d{1,3})',
+    'macAddress':r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})',
+    'PassportNumber': r'([T|M|S|R|G|D|t|m|s|r|g|d])(\d{8})',
+    'DriverLicenseNumber': r'([1-2]{1}\d{1}|서울|경기|강원|충북|충남|전북|광주전남|경북|경남|제주|대구|인천|대전|울산)([-])(\d{2}[-])(\d{6}[-])(\d{2})',
+    'HealthInsuranceCertification' : r'([1,2,5,7]{1})[-](\d{10})',
+    'ImageFile': r'(^\w+.(jpg|png|gif|bmp|tif))',
+    'CompressionFile': r'(\w+.(tar|zip|gzip|alz|egg|iso|7zip))',
+    'AudioFile': r'^\w+.(mp3|wav)',
+    'DocumentFile':r'(^\w+.(pdf|rtf|html|xml|csv|txt|ppt|hwp|xlxs|docx|log))'
+}
+
+
+def extract_csv(stringData, file_name):
+    with open("regex_result/" + file_name + '.csv', "w") as file:
+        file.write(file_name + "\n" + stringData)
+        file.close()
+
+def extract_all(text):
+    for i in range(0, len(preComfile_list)):
+        for regex in preComfile_dic[preComfile_list[i]].findall(text):
+            preComfile_list[i] + ' : ' + str(regex)
+
+def extract_test(text):
+    for i in range(0, len(test_list)):
+        result=''
+        for regex in test_dic[test_list[i]].findall(text):
+            result += str(regex[0]) + '\n'
+        print("##### EXTRACT {0} !!! DONE !!!! #####".format(test_list[i]))
+        extract_csv(result, test_list[i])
+
+if __name__ == "__main__":
+    print("Start Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
+    
+    # 0.1sec
+    with open('test2.txt', 'r', encoding='UTF8') as f:
+        data = f.read()
+
+        # regualr_result = re.compile("(%s)|(%s)|(%s)|(%s)"%(re1,re2,re3,re4)).sub(r'\1,\2,\3,\4\n', data)
+        # regualr_result = re.compile("(%s)|(%s)|(%s)"%(dic_reg['AudioFile'],dic_reg['ResidentRegistrationNumber'],dic_reg['PhoneNumber']))
+
+        # test = regualr_result.findall(data)
+        # print(test)
+        # print(test[0])
+        # string=""
+        # for i in range(0,len(test)):
+        #     string += ','.join(test[i])+'\n'
+        #     print(string)
+        
+        # extract_csv(string,"ext.csv")
+        
+        extract_test(data)
+        
+        # 정규화 값 쪼개서 CSV로
+        # temp_list = regualr_result.split('\n')
+        # temp_list = [line.split(',') for line in temp_list]
+
+        # extract_csv(regualr_result, "extract.csv")
+        
  
+        # df = pd.DataFrame(temp_list, columns=colums_list)
 
-print("Start Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
-
-with open('test.txt', 'r') as f:
-    # 파일 한줄 씩 읽는거. 성능안좋아서 안쓸듯
-    # while True:
-    #     line = f.readline()
-    #     if not line: break
-    #     print(line)
-
-    data = f.read()
-    
-    # re_list = re.compile("(%s|%s|%s|%s)" % (re1, re2, re3, re4)).findall(data)
-    # print(re_list)
-
-    # for r in re_list:
-    #     extract_all(r)
-
-
-    # group을 사용하면 or 연산중 하나라도 찾을 경우에 다음 뒷 문자열을 전부 버려버림... group은 한 정규식에서 원하는부분만 추출할 경우에 사용해야 함
-    '''
-    generic_re = re.compile("(?P<func>%s)|(%s)|(%s)|(%s)" % ((re1), (re2), (re3), (re4)))
-    generic_re = re.compile("(?P<func>\s?\d{3}[-]\d{5}[-]\d{3})|(?P<fc2>\d{3}[-]\d{6}[-]\d{5})|(\s?\d{3}[-]\d{2}[-]\d{5}[-]\d{1})|(\d{3}[-]\d{4}[-]\d{4}[-]\d{3})")
-    m = generic_re.search("333-55555-333 333-22-55555-1 333-666666-555")
-    print(m)
-    print(m.group('func'))
-    print(m.group('fc2'))
-    print(m.group(2))
-    print(m.group(3))
-    print(m.group(4))
-    '''
-
-    colums_list = ['re1','re2','re3','re4']
-
-    # for_csv = re.compile("(%s)|(%s)|(%s)|(%s)"%(re1,re2,re3,re4)).sub(r'\1,\2,\3,\4\n',data)
-    # print(for_csv)
+        # DataFrame에 공백이 있으면 null값으로 대체
+        # df['re1'] = df['re1'].replace(" ",np.NaN)
     
     
-    # list1 = for_csv.split('\n')
-    # list1 = [line.split(',') for line in list1]
-    # df = pd.DataFrame(list1, columns=colums_list)
-
-    # df['re1'] = df['re1'].replace(" ",np.NaN)
     
-    # print(df['re1'].head(20))
-    # print(len(df['re1'][2]))
-    # print(df['re1'][2])
-
-    # print(df['re1'].dropna())
-
-
     
-    # CSV로 뽑
-    # with open("extract.csv", "w") as file:
-    #     file.write("re1,re2,re3,re4\n"+for_csv)
-    #     file.close()
-
-    df = pd.read_csv("extract.csv")
-    # print(df.head(10))
-
-
-    # NULL값 제거하고 shift
-    df1 = df['re1'].dropna(axis=0).reset_index(drop=True)
-    df2 = df['re2'].dropna(axis=0).reset_index(drop=True)
-    df3 = df['re3'].dropna(axis=0).reset_index(drop=True)
-    df4 = df['re4'].dropna(axis=0).reset_index(drop=True)
-
-    condf = pd.concat([df1, df2, df3, df4], axis=1, ignore_index=True)
-    condf.columns = colums_list
-    print(condf)
-
-    # print(df['re1'].head(5))
-
-    # 문자열 한줄씩 읽어서 처리하는건 너무 오래 걸림
-    '''
-    resub = re.compile("(%s)|(%s)|(%s)|(%s)" %(re1, re2, re3, re4)).sub(r're1:\1, re2:\2, re3:\3, re4:\4\n', data)
-
-    re1_list = []
-    re2_list = []
-    re3_list = []
-    re4_list = []
-
-    for i in resub.splitlines():
-        if 're1:' in i:
-            re1_list.append(re.findall(re1,i))
-        elif 're2:' in i:
-            re2_list.append(re.findall(re2,i))
-        elif 're3:' in i:
-            re3_list.append(re.findall(re3,i))
-        elif 're4:' in i:
-            re2_list.append(re.findall(re4,i))
-        else:
-            pass
     
-    sum(re1_list,[])
-    '''
-
-
-
-    # extract_all(data)
-
-
-print("End Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
-
-
-
+    
+    
+    
+    
+    
+    
+    print("End Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
+    
