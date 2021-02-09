@@ -1,4 +1,9 @@
 import re
+import time
+import pandas as pd
+import numpy as np
+
+start = time.time()
 
 # 지역별 전화번호
 # 02서울 / 031경기 / 032인천 / 033강원 / 041충남 / 042대전 / 043충북 / 051부산 / 052울산 / 053대구 / 054경북 / 055경남 / 061전남 / 062광주 / 063전북 / 064제주
@@ -16,7 +21,7 @@ localphoneRegex = re.compile(r'''(
 
 # 휴대폰 번호
 phoneRegex = re.compile(r'''(
-    ([01]{2})   # 
+    ([01]{2})
     ([0|1|6|7|9]{1})
     (\W)?
     ([0-9]{3,4})
@@ -97,16 +102,7 @@ accountConfig = '''
 \d{3}[-]\d{5}[-]\d{3}
 
 '''
-
-re1 = r'\s?\d{3}[-]\d{5}[-]\d{3}'
-re2 = r'\s?\d{3}[-]\d{6}[-]\d{5}'
-re3 = r'\s?\d{3}[-]\d{2}[-]\d{5}[-]\d{1}'
-re4 = r'\s?\d{3}[-]\d{4}[-]\d{4}[-]\d{3}'
  
-# generic_re = re.compile("(%s|%s|%s|%s)" % (re1, re2, re3, re4)).findall("111-22222-333 111-222222-33333 111-22-33333-4 111-2222-3333-444")
-# print(generic_re)
-
-
 # IP 주소
 ipAddressRegex = re.compile(r'''(
     (\d{1,3})
@@ -171,7 +167,7 @@ docRegex = re.compile(r'''(
 
 
 # 위 정규식 통합 Dictionary
-dic_reg = {
+preComfile_dic = {
     'E-mail': emailRegex,
     'Local_PhoneNumber': localphoneRegex,
     'PhoneNumber': phoneRegex,
@@ -189,24 +185,104 @@ dic_reg = {
 }
 
 # Dictionary로 KEY List 생성
-reg_list = list(dic_reg.keys())
+preComfile_list = list(preComfile_dic.keys())
 
+
+test_dic = {
+    'E-mail': emailRegex,
+    'PhoneNumber': phoneRegex,
+    'ResidentRegistrationNumber': registNumberRegex
+}
+
+test_list = list(test_dic.keys())
+
+
+# colums_list = ['re1','re2','re3','re4']
+
+re1 = r'\d{3}[-]\d{5}[-]\d{3}'
+re2 = r'\s?\d{3}[-]\d{6}[-]\d{5}'
+re3 = r'\s?\d{3}[-]\d{2}[-]\d{5}[-]\d{1}'
+re4 = r'\s?\d{3}[-]\d{4}[-]\d{4}[-]\d{3}'
+
+dic_reg = {
+    'E-mail': r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}',
+    'Local_PhoneNumber': r'(\()?[0]{1}[2-6]{1}([1-5]{1})?(\))?(\W)?(\d{3}|\d{4})(\W)([0-9]{4})',
+    'PhoneNumber': r'[01]{2}[0|1|6|7|9]{1}\W?[0-9]{3,4}\W?[0-9]{4}',
+    'ResidentRegistrationNumber': r'\d{2}[0-1]{1}[0-9]{1}[0-3]{1}[0-9]{1}\s?[-]\s?[1-4]{1}\d{6}',
+    'CreditCardNumber':r'([3-6]{1}|[9]{1})(\d{3})([-]\d{4}[-]\d{4}[-]\d{4})',
+    'ipAddress':r'(\d{1,3})[.](\d{1,3})[.](\d{1,3})[.](\d{1,3})',
+    'macAddress':r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})',
+    'PassportNumber': r'([T|M|S|R|G|D|t|m|s|r|g|d])(\d{8})',
+    'DriverLicenseNumber': r'([1-2]{1}\d{1}|서울|경기|강원|충북|충남|전북|광주전남|경북|경남|제주|대구|인천|대전|울산)([-])(\d{2}[-])(\d{6}[-])(\d{2})',
+    'HealthInsuranceCertification' : r'([1,2,5,7]{1})[-](\d{10})',
+    'ImageFile': r'(^\w+.(jpg|png|gif|bmp|tif))',
+    'CompressionFile': r'(\w+.(tar|zip|gzip|alz|egg|iso|7zip))',
+    'AudioFile': r'^\w+.(mp3|wav)',
+    'DocumentFile':r'(^\w+.(pdf|rtf|html|xml|csv|txt|ppt|hwp|xlxs|docx|log))'
+}
+
+
+def extract_csv(stringData, file_name):
+    with open("regex_result/" + file_name + '.csv', "w") as file:
+        file.write(file_name + "\n" + stringData)
+        file.close()
 
 def extract_all(text):
-    for i in range(0, len(reg_list)):
-        for regex in dic_reg[reg_list[i]].findall(text):
-            print(reg_list[i] + ' : ' + str(regex))
+    for i in range(0, len(preComfile_list)):
+        for regex in preComfile_dic[preComfile_list[i]].findall(text):
+            preComfile_list[i] + ' : ' + str(regex)
 
-
-
+def extract_test(text):
+    for i in range(0, len(test_list)):
+        result=''
+        for regex in test_dic[test_list[i]].findall(text):
+            result += str(regex[0]) + '\n'
+        print("##### EXTRACT {0} !!! DONE !!!! #####".format(test_list[i]))
+        extract_csv(result, test_list[i])
 
 if __name__ == "__main__":
-    msg = '안녕하세요. 제 이름은 김김김 입니다. 제 주민등록번호는 940804-1111111이고 동생의 주민등록번호는 951011-2222222입니다.  메일은 rain@naver.com임. 휴대폰번호는 010-3322-2233이며 제가 첨부드릴파일은 다음과같습니다. s.zip, 또다른 메일주소는 1344@naver.com'
-    extract_all(msg)
+    print("Start Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
+    
+    # 0.1sec
+    with open('test2.txt', 'r', encoding='UTF8') as f:
+        data = f.read()
 
+        # regualr_result = re.compile("(%s)|(%s)|(%s)|(%s)"%(re1,re2,re3,re4)).sub(r'\1,\2,\3,\4\n', data)
+        # regualr_result = re.compile("(%s)|(%s)|(%s)"%(dic_reg['AudioFile'],dic_reg['ResidentRegistrationNumber'],dic_reg['PhoneNumber']))
 
-    # x = '3~4개월'
-    # print(re.sub(r"(?P<month1>\d{1})~(?P<month2>\d{1})", r'\g<month1>개월 \g<month2>', '3~4개월'))
-    # print(re.sub(r"\d{1})~(\d{1})", r'\1', x))
+        # test = regualr_result.findall(data)
+        # print(test)
+        # print(test[0])
+        # string=""
+        # for i in range(0,len(test)):
+        #     string += ','.join(test[i])+'\n'
+        #     print(string)
+        
+        # extract_csv(string,"ext.csv")
+        
+        extract_test(data)
+        
+        # 정규화 값 쪼개서 CSV로
+        # temp_list = regualr_result.split('\n')
+        # temp_list = [line.split(',') for line in temp_list]
 
+        # extract_csv(regualr_result, "extract.csv")
+        
+ 
+        # df = pd.DataFrame(temp_list, columns=colums_list)
 
+        # DataFrame에 공백이 있으면 null값으로 대체
+        # df['re1'] = df['re1'].replace(" ",np.NaN)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    print("End Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
+    

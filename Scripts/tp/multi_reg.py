@@ -1,6 +1,7 @@
 import re
 import time
 import pandas as pd
+import numpy as np
 
 start = time.time()
 
@@ -58,10 +59,10 @@ def extract_all(text):
             # print(reg_list[i] + ' : ' + str(regex))
             reg_list[i] + ' : ' + str(regex)
 
-re1 = r'\d{3}[-]\d{5}[-]\d{3}'
+re1 = r'\s?\d{3}[-]\d{5}[-]\d{3}'
 re2 = r'\s?\d{3}[-]\d{6}[-]\d{5}'
 re3 = r'\s?\d{3}[-]\d{2}[-]\d{5}[-]\d{1}'
-re4 = r'\d{3}[-]\d{4}[-]\d{4}[-]\d{3}'
+re4 = r'\s?\d{3}[-]\d{4}[-]\d{4}[-]\d{3}'
  
 
 print("Start Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
@@ -97,12 +98,22 @@ with open('test.txt', 'r') as f:
 
     colums_list = ['re1','re2','re3','re4']
 
-    for_csv = re.compile("(%s)|(%s)|(%s)|(%s)" %(re1, re2, re3, re4)).sub(r'\1,\2,\3,\4\n', data)
-    list1 = for_csv.split('\n')
-    list1 = [line.split(',') for line in list1]
-    df = pd.DataFrame(list1, columns=colums_list)
+    # for_csv = re.compile("(%s)|(%s)|(%s)|(%s)"%(re1,re2,re3,re4)).sub(r'\1,\2,\3,\4\n',data)
+    # print(for_csv)
+    
+    
+    # list1 = for_csv.split('\n')
+    # list1 = [line.split(',') for line in list1]
+    # df = pd.DataFrame(list1, columns=colums_list)
 
-    print(df.dropna(axis=0))
+    # df['re1'] = df['re1'].replace(" ",np.NaN)
+    
+    # print(df['re1'].head(20))
+    # print(len(df['re1'][2]))
+    # print(df['re1'][2])
+
+    # print(df['re1'].dropna())
+
 
     
     # CSV로 뽑
@@ -110,6 +121,21 @@ with open('test.txt', 'r') as f:
     #     file.write("re1,re2,re3,re4\n"+for_csv)
     #     file.close()
 
+    df = pd.read_csv("extract.csv")
+    # print(df.head(10))
+
+
+    # NULL값 제거하고 shift
+    df1 = df['re1'].dropna(axis=0).reset_index(drop=True)
+    df2 = df['re2'].dropna(axis=0).reset_index(drop=True)
+    df3 = df['re3'].dropna(axis=0).reset_index(drop=True)
+    df4 = df['re4'].dropna(axis=0).reset_index(drop=True)
+
+    condf = pd.concat([df1, df2, df3, df4], axis=1, ignore_index=True)
+    condf.columns = colums_list
+    print(condf)
+
+    # print(df['re1'].head(5))
 
     # 문자열 한줄씩 읽어서 처리하는건 너무 오래 걸림
     '''
