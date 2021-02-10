@@ -21,6 +21,7 @@ localphoneRegex = re.compile(r'''(
 
 # 휴대폰 번호
 phoneRegex = re.compile(r'''(
+    \s
     ([01]{2})
     ([0|1|6|7|9]{1})
     (\W)?
@@ -196,30 +197,9 @@ test_dic = {
 
 test_list = list(test_dic.keys())
 
-
-# colums_list = ['re1','re2','re3','re4']
-
-re1 = r'\d{3}[-]\d{5}[-]\d{3}'
-re2 = r'\s?\d{3}[-]\d{6}[-]\d{5}'
-re3 = r'\s?\d{3}[-]\d{2}[-]\d{5}[-]\d{1}'
-re4 = r'\s?\d{3}[-]\d{4}[-]\d{4}[-]\d{3}'
-
-dic_reg = {
-    'E-mail': r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}',
-    'Local_PhoneNumber': r'(\()?[0]{1}[2-6]{1}([1-5]{1})?(\))?(\W)?(\d{3}|\d{4})(\W)([0-9]{4})',
-    'PhoneNumber': r'[01]{2}[0|1|6|7|9]{1}\W?[0-9]{3,4}\W?[0-9]{4}',
-    'ResidentRegistrationNumber': r'\d{2}[0-1]{1}[0-9]{1}[0-3]{1}[0-9]{1}\s?[-]\s?[1-4]{1}\d{6}',
-    'CreditCardNumber':r'([3-6]{1}|[9]{1})(\d{3})([-]\d{4}[-]\d{4}[-]\d{4})',
-    'ipAddress':r'(\d{1,3})[.](\d{1,3})[.](\d{1,3})[.](\d{1,3})',
-    'macAddress':r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})',
-    'PassportNumber': r'([T|M|S|R|G|D|t|m|s|r|g|d])(\d{8})',
-    'DriverLicenseNumber': r'([1-2]{1}\d{1}|서울|경기|강원|충북|충남|전북|광주전남|경북|경남|제주|대구|인천|대전|울산)([-])(\d{2}[-])(\d{6}[-])(\d{2})',
-    'HealthInsuranceCertification' : r'([1,2,5,7]{1})[-](\d{10})',
-    'ImageFile': r'(^\w+.(jpg|png|gif|bmp|tif))',
-    'CompressionFile': r'(\w+.(tar|zip|gzip|alz|egg|iso|7zip))',
-    'AudioFile': r'^\w+.(mp3|wav)',
-    'DocumentFile':r'(^\w+.(pdf|rtf|html|xml|csv|txt|ppt|hwp|xlxs|docx|log))'
-}
+def add_Dictionary(dictionary, key):
+    dictionary.setdefault(key, preComfile_dic.pop(key))
+    print(dictionary)
 
 
 def extract_csv(stringData, file_name):
@@ -227,62 +207,34 @@ def extract_csv(stringData, file_name):
         file.write(file_name + "\n" + stringData)
         file.close()
 
-def extract_all(text):
+def generate_RegularExpression_Result(text):
     for i in range(0, len(preComfile_list)):
+        result=''
         for regex in preComfile_dic[preComfile_list[i]].findall(text):
-            preComfile_list[i] + ' : ' + str(regex)
+            result += str(regex[0]) + '\n'
+        print("##### EXTRACT {0} !!! DONE !!!! #####".format(preComfile_list[i]))
+        extract_csv(result, preComfile_list[i])   # (String Data, File Name)
 
 def extract_test(text):
     for i in range(0, len(test_list)):
         result=''
         for regex in test_dic[test_list[i]].findall(text):
             result += str(regex[0]) + '\n'
-        print("##### EXTRACT {0} !!! DONE !!!! #####".format(test_list[i]))
-        extract_csv(result, test_list[i])
+        # print("##### EXTRACT {0} !!! DONE !!!! #####".format(test_list[i]))
+        # extract_csv(result, test_list[i])   # (String Data, File Name)
+        # print(result)
 
 if __name__ == "__main__":
     print("Start Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
     
     # 0.1sec
-    with open('test2.txt', 'r', encoding='UTF8') as f:
+    with open('test.txt', 'r', encoding='UTF8') as f:
         data = f.read()
+        dic={}
+        add_Dictionary(dic, 's')
+        # extract_test(data)
+        # generate_RegularExpression_Result(data)
 
-        # regualr_result = re.compile("(%s)|(%s)|(%s)|(%s)"%(re1,re2,re3,re4)).sub(r'\1,\2,\3,\4\n', data)
-        # regualr_result = re.compile("(%s)|(%s)|(%s)"%(dic_reg['AudioFile'],dic_reg['ResidentRegistrationNumber'],dic_reg['PhoneNumber']))
 
-        # test = regualr_result.findall(data)
-        # print(test)
-        # print(test[0])
-        # string=""
-        # for i in range(0,len(test)):
-        #     string += ','.join(test[i])+'\n'
-        #     print(string)
-        
-        # extract_csv(string,"ext.csv")
-        
-        extract_test(data)
-        
-        # 정규화 값 쪼개서 CSV로
-        # temp_list = regualr_result.split('\n')
-        # temp_list = [line.split(',') for line in temp_list]
-
-        # extract_csv(regualr_result, "extract.csv")
-        
- 
-        # df = pd.DataFrame(temp_list, columns=colums_list)
-
-        # DataFrame에 공백이 있으면 null값으로 대체
-        # df['re1'] = df['re1'].replace(" ",np.NaN)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     print("End Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
     

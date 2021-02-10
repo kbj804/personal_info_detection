@@ -244,23 +244,22 @@ if __name__ == "__main__":
     print("Start Time :", time.time() - start)  # 현재시각 - 시작시간 = 실행 시간
     
     # 0.1sec
-    with open('test2.txt', 'r', encoding='UTF8') as f:
+    with open('test.txt', 'r', encoding='UTF8') as f:
         data = f.read()
 
         # regualr_result = re.compile("(%s)|(%s)|(%s)|(%s)"%(re1,re2,re3,re4)).sub(r'\1,\2,\3,\4\n', data)
-        # regualr_result = re.compile("(%s)|(%s)|(%s)"%(dic_reg['AudioFile'],dic_reg['ResidentRegistrationNumber'],dic_reg['PhoneNumber']))
-
-        # test = regualr_result.findall(data)
+        regualr_result = re.compile("(%s)|(%s)|(%s)"%(dic_reg['E-mail'],dic_reg['ResidentRegistrationNumber'],dic_reg['PhoneNumber']))
+        test = regualr_result.findall(data)
         # print(test)
         # print(test[0])
-        # string=""
-        # for i in range(0,len(test)):
-        #     string += ','.join(test[i])+'\n'
-        #     print(string)
+        string=""
+        for i in range(0,len(test)):
+            string += ','.join(test[i])+'\n'
+            # print(test[i])
         
-        # extract_csv(string,"ext.csv")
+        extract_csv(string,"ext.csv")
         
-        extract_test(data)
+        # extract_test(data)
         
         # 정규화 값 쪼개서 CSV로
         # temp_list = regualr_result.split('\n')
