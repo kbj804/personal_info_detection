@@ -5,7 +5,7 @@ import time
 # print(os.path.abspath(os.path.dirname(__file__)))
 from Scripts.tp.regex.regularExpression_configs import RegexConfigs
 
-class regexDictionaryManagerClass:
+class regexManager:
     def __init__(self):
         # new regex Dictionary
         self.dictionary={}
@@ -40,6 +40,7 @@ class regexDictionaryManagerClass:
         print("key list = {}".format(keys))
         print(self.dictionary)
 
+    # csv로 추출
     def extract_csv(self, data, filename):
         with open("./regex_result/" + filename + '.csv', "w") as file:
             file.write(filename + '\n' + data)
@@ -56,20 +57,4 @@ class regexDictionaryManagerClass:
             
             self.extract_csv(result, keys[i])
             print("{} is Success Extract".format(keys[i]))
-            
-    def generate_data(self, file):
-        with open(file, 'r', encoding='UTF8') as f:
-            data = f.read()
-            return data
-            
 
-a = regexDictionaryManagerClass()
-a.add_regex('E-mail2')
-a.add_regex('E-mail')
-a.add_regex('ipAddress')
-a.add_regex('PhoneNumber')
-a.show_dictionary()
-
-data = a.generate_data('test2.txt')
-
-a.get_regex_result(data)

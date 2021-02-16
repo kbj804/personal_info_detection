@@ -230,8 +230,9 @@ if __name__ == "__main__":
     # 0.1sec
     with open('test.txt', 'r', encoding='UTF8') as f:
         data = f.read()
+        
         dic={}
-        add_Dictionary(dic, 's')
+        add_Dictionary(dic, 'PhoneNumber')
         # extract_test(data)
         # generate_RegularExpression_Result(data)
 
