@@ -14,6 +14,7 @@ from io import StringIO
 import olefile
 from pptx import Presentation
 from docx import Document
+import csv
 
 class loadFileManager:
     # 파일 이름, 확장자 분리
@@ -93,15 +94,40 @@ class loadFileManager:
 
     def read_pptx(self):
         pptxdoc = Presentation(self.path)
-        fullText = []
+        # text_runs will be populated with a list of strings,
+        # one for each text run in presentation
+        text_runs = []
         for slide in pptxdoc.slides:
             for shape in slide.shapes:
-                if not shape.has_text_frame:
-                    continue
-                for paragraph in shape.text_frame.paragraphs:
-                    fullText.append(paragraph.text)
-                    
-        return '\n'.join(fullText)
+                if shape.has_text_frame:
+                    # print("text")
+                    if not shape.has_text_frame:
+                        continue
+                    for paragraph in shape.text_frame.paragraphs:
+                        # 1. run -> 모든 내용 제목 까지 전부다
+                        for run in paragraph.runs:
+                            text_runs.append(run.text)
+
+                        # 2. paragraph -> 페이지별로 구분됨
+                        # text_runs.append(paragraph.text)
+                
+                elif shape.has_table:
+                    # print("table")
+                    tb1 = shape.table
+                    row_count = len(tb1.rows)
+                    col_count = len(tb1.columns)
+                    for r in range(0, row_count):
+                        for c in range(0, col_count):
+                            cell = tb1.cell(r,c)
+                            paragraphs = cell.text_frame.paragraphs 
+                            for paragraph in paragraphs:
+                                for run in paragraph.runs:
+                                    text_runs.append(run.text)
+                else:
+                    # print("etc")
+                    pass
+ 
+        return '\n'.join(text_runs)
 
     def read_docx(self):
         # with open(self.path, 'rb') as f:
@@ -114,7 +140,10 @@ class loadFileManager:
 
         return '\n'.join(fullText)
 
-    def read_exel():
+    def read_csv():
+        pass
+
+    def read_xslx():
         pass
 
     def read_txt(self):
@@ -130,7 +159,8 @@ class loadFileManager:
         'hwp': read_hwp,
         'pptx': read_pptx,
         'docx': read_docx,
-        'exel': read_exel,
+        'csv': read_csv,
+        'xslx': read_xslx,
         'txt': read_txt,
         'html': read_html
     }
