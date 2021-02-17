@@ -10,9 +10,10 @@ def generate_data(file):
         data = f.read()
         return data
             
-file = loadFileManager("text.pdf")
-print(file.name)
-print(file.ext)
+file = loadFileManager("txt_sample.txt")
+print(file.data)
+
+
 
 # a = regexManager()
 

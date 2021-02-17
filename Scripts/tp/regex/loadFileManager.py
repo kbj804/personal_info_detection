@@ -5,7 +5,7 @@ from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from io import StringIO
-
+import olefile
 
 class loadFileManager:
     # 파일 이름, 확장자 분리
@@ -13,7 +13,35 @@ class loadFileManager:
         # dir_path = os.getcwd()
         self.path = path
         basename = os.path.basename(self.path)
-        self.name, self.ext = os.path.splitext(basename)
+        self.name, self.dotext = os.path.splitext(basename)
+        self.ext = self.dotext.replace(".",'',1)
+
+        self.data = ''
+
+        # 읽을 수 있는 파일인지 검사하고 읽을 수 있으면 data입력
+        if self.check_ext():
+            self.data = self.read_file()
+
+        else:
+            print("여기론 안와")
+            pass
+    
+    # 확장자에 맞는 read 함수로 매핑
+    def read_file(self):
+        result = self.read_function[self.ext](self)
+        return result 
+
+    # 읽을 수 있는 확장자인가 검사
+    def check_ext(self):
+        try:
+            if self.read_function[self.ext]:
+                return True
+            else:
+                print("@ # @ # {} For Debugging... @ # @ #".format(self.ext))
+                return False
+
+        except Exception as e:
+            print("####ERROR#### {0} dose not exist in ext Dictionary".format(e))
 
     # 확장자 별 데이터 오픈
     # pdf, hwp, ppt, docx, ....
@@ -41,16 +69,21 @@ class loadFileManager:
             str = retstr.getvalue()
 
             fp.close()
+        
         device.close()
         retstr.close()
         # f.close()
         
         return str
 
-    def read_hwp():
-        pass
+    def read_hwp(self):
+        f = olefile.OleFileIO(self.path)
+        encoded_text = f.openstream('PrvText').read()
+        decoded_text = encoded_text.decode('UTF-16')
+        
+        return decoded_text
 
-    def read_ppt():
+    def read_pptx():
         pass
 
     def read_docx():
@@ -59,15 +92,21 @@ class loadFileManager:
     def read_exel():
         pass
 
+    def read_txt(self):
+        with open(self.path, 'r', encoding='UTF8') as f:
+            data = f.read()
+            return data
+
     read_function = {
         'pdf': read_pdf,
         'hwp': read_hwp,
-        'ppt': read_ppt,
+        'pptx': read_pptx,
         'docx': read_docx,
-        'exel': read_exel
-
+        'exel': read_exel,
+        'txt': read_txt
     }
+    
+    
 
-a = loadFileManager('t.pdf')
-
-print(a.read_pdf())
+# a = loadFileManager('hwp_sample.hwp')
+# print(a.data)
