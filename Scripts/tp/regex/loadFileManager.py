@@ -94,9 +94,13 @@ class loadFileManager:
     def read_pptx(self):
         pptxdoc = Presentation(self.path)
         fullText = []
-        for para in pptxdoc.paragraphs:
-            fullText.append(para.text)
-
+        for slide in pptxdoc.slides:
+            for shape in slide.shapes:
+                if not shape.has_text_frame:
+                    continue
+                for paragraph in shape.text_frame.paragraphs:
+                    fullText.append(paragraph.text)
+                    
         return '\n'.join(fullText)
 
     def read_docx(self):
