@@ -1,3 +1,9 @@
+'''
+pip install pdfminer.six
+pip install 'olefile'  or '-U olefile'
+pip install python-pptx
+pip install python-docx
+'''
 import os
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import HTMLConverter
@@ -6,6 +12,8 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from io import StringIO
 import olefile
+from pptx import Presentation
+from docx import Document
 
 class loadFileManager:
     # 파일 이름, 확장자 분리
@@ -83,11 +91,24 @@ class loadFileManager:
         
         return decoded_text
 
-    def read_pptx():
-        pass
+    def read_pptx(self):
+        pptxdoc = Presentation(self.path)
+        fullText = []
+        for para in pptxdoc.paragraphs:
+            fullText.append(para.text)
 
-    def read_docx():
-        pass
+        return '\n'.join(fullText)
+
+    def read_docx(self):
+        # with open(self.path, 'rb') as f:
+        #     source_stream = StringIO(f.read())
+        document = Document(self.path)
+        fullText = []
+        for para in document.paragraphs:
+            fullText.append(para.text)
+        # source_stream.close()
+
+        return '\n'.join(fullText)
 
     def read_exel():
         pass
@@ -96,6 +117,9 @@ class loadFileManager:
         with open(self.path, 'r', encoding='UTF8') as f:
             data = f.read()
             return data
+    
+    def read_html(self):
+        pass
 
     read_function = {
         'pdf': read_pdf,
@@ -103,7 +127,8 @@ class loadFileManager:
         'pptx': read_pptx,
         'docx': read_docx,
         'exel': read_exel,
-        'txt': read_txt
+        'txt': read_txt,
+        'html': read_html
     }
     
     

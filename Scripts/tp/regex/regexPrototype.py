@@ -4,13 +4,8 @@ from Scripts.tp.regex.loadFileManager import loadFileManager
 
 origin_regex = regexManager()
 
-# 파일을 위 클래스 init에 넣을지 말지 고민좀....
-def generate_data(file):
-    with open(file, 'r', encoding='UTF8') as f:
-        data = f.read()
-        return data
             
-file = loadFileManager("txt_sample.txt")
+file = loadFileManager("pptx_sample.pptx")
 print(file.data)
 
 
@@ -24,6 +19,5 @@ print(file.data)
 
 # a.show_dictionary()
 
-# data = generate_data('test2.txt')
 
-# a.get_regex_result(data)
+# a.get_regex_result(file.data)
