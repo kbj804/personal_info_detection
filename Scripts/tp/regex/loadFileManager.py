@@ -155,21 +155,34 @@ class loadFileManager:
         
         return '\n'.join(answer)
 
+    # 리스트 값 안에 숫자형도 있어서 \n . join 사용이 안됨
+    # 리스트가 3차원 까지 가서 코드가 다소 복잡함
+    # 마지막 리스트가 문자열로 치환이 안되어 추수 수정 필요
     def read_xlsx(self):
         workbook = openpyxl.load_workbook(self.path, data_only=True)
+        # Sheet 목록
         sheet_list = workbook.sheetnames
         all_sheet_value=[]
+        
+        # Sheet 별 탐색
         for sheet in sheet_list:
             all_values = []
             workSheet = workbook[sheet]
             for row in workSheet.rows:
                 row_value =[]
                 for cell in row:
-                    row_value.append(cell.value)
+                    if cell.value is None:
+                        pass
+                    else:
+                        row_value.append(cell.value)
                 all_values.append(row_value)
-            all_sheet_value.append(all_values)
+            # 차원축소1
+            answer = sum(all_values,[])
+            all_sheet_value.append(answer)
+        # 차원축소2
+        answer2 = sum(all_sheet_value, [])
 
-        return all_sheet_value
+        return str(answer2)
         
 
     def read_txt(self):
