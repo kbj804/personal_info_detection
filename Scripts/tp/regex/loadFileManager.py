@@ -3,6 +3,7 @@ pip install pdfminer.six
 pip install 'olefile'  or '-U olefile'
 pip install python-pptx
 pip install python-docx
+pip install openpyxl
 '''
 import os
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
@@ -15,6 +16,7 @@ import olefile
 from pptx import Presentation
 from docx import Document
 import csv
+import openpyxl
 
 class loadFileManager:
     # 파일 이름, 확장자 분리
@@ -140,11 +142,35 @@ class loadFileManager:
 
         return '\n'.join(fullText)
 
-    def read_csv():
-        pass
+    # csv 코덱문제 해결하고 엑셀읽기 하고 html읽기 하면됨 
+    def read_csv(self):
+        read_list=[]
+        with open(self.path, 'r', encoding='UTF8') as file:
+            file_read = csv.reader(file)
+            for line in file_read:
+                read_list.append(line)
 
-    def read_xslx():
-        pass
+            # 2차원 리스트 -> 1차원으로
+            answer = sum(read_list,[])
+        
+        return '\n'.join(answer)
+
+    def read_xlsx(self):
+        workbook = openpyxl.load_workbook(self.path, data_only=True)
+        sheet_list = workbook.sheetnames
+        all_sheet_value=[]
+        for sheet in sheet_list:
+            all_values = []
+            workSheet = workbook[sheet]
+            for row in workSheet.rows:
+                row_value =[]
+                for cell in row:
+                    row_value.append(cell.value)
+                all_values.append(row_value)
+            all_sheet_value.append(all_values)
+
+        return all_sheet_value
+        
 
     def read_txt(self):
         with open(self.path, 'r', encoding='UTF8') as f:
@@ -160,7 +186,7 @@ class loadFileManager:
         'pptx': read_pptx,
         'docx': read_docx,
         'csv': read_csv,
-        'xslx': read_xslx,
+        'xlsx': read_xlsx,
         'txt': read_txt,
         'html': read_html
     }

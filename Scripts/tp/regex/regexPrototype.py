@@ -4,8 +4,8 @@ from Scripts.tp.regex.loadFileManager import loadFileManager
 
 origin_regex = regexManager()
 
-            
-file = loadFileManager("pptx_sample.pptx")
+# file = loadFileManager("csv_sample.csv")
+file = loadFileManager("xlsx_sample.xlsx")
 print(file.data)
 
 
