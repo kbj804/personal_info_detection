@@ -5,8 +5,9 @@ from Scripts.tp.regex.loadFileManager import loadFileManager
 origin_regex = regexManager()
 
 # file = loadFileManager("csv_sample.csv")
-file = loadFileManager("xlsx_sample.xlsx")
-print(file.data)
+file = loadFileManager("pdf_sample2.pdf")
+
+# print(file.data)
 
 
 

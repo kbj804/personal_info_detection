@@ -1,53 +1,31 @@
-import pytesseract
-import cv2
+from random import uniform
+import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
-# Path 주의!
 
-# print(cv2.version)
-pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract'
-config = ('-l kor+eng --oem 2 --psm 4')
+def random_list(size):
+    result=[]
+    for i in range(size):
+        result.append(uniform(-5.0,5.0))
+    
+    return result
 
-img = cv2.imread('receipt.png')
+df_A = pd.DataFrame({"A":random_list(5), "B":random_list(5), "C":random_list(5), "D":random_list(5)})
+df_A.index=['2020-01-01','2020-01-02','2020-01-03','2020-01-04','2020-01-05']
+# print(df_A.sort_values(by='C',ascending=False))
+# print(df_A.[loc[:,['A']]])
+# print(df_A.iloc[[2,4]])
+# print(df_A.iloc[4])
+# row coulmn
+# print(df_A.iloc[1:4,0:2])
+# df_A.loc[df_A.values>0.3] = np.nan
+print(df_A[df_A>0])
 
-# cv2.imshow('image', img)
-# cv2.waitKey(0)
-# print(pytesseract.image_to_string(img, config=config))
+# def generate_list(s, size):
+#     result=[]
+#     for i in range(size):
+#         result.append(s+str(i))
+#     return result
+# column = ["A", "B", "C", "D"]
+# df_B = pd.DataFrame({column[0]:generate_list(column[0],12), column[1]:generate_list(column[1],12), column[2]:generate_list(column[2],12), column[3]:generate_list(column[3],12)})
 
-
-canny = cv2.Canny(img,30,70)
-
-laplacian = cv2.Laplacian(img,cv2.CV_8U)
-sobelx = cv2.Sobel(img,cv2.CV_8U,1,0,ksize=3)
-sobely = cv2.Sobel(img,cv2.CV_8U,0,1,ksize=3)
-
-images = [img, laplacian, sobelx, sobely, canny]
-titles = ['Origianl', 'Laplacian', 'Sobel X', 'Sobel Y','Canny']
-
-for i in range(5):
-    plt.subplot(2,3,i+1),plt.imshow(images[i]),plt.title([titles[i]])
-    plt.xticks([]),plt.yticks([])
-
-plt.show()
-
-
-# gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-# gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-
-# 블러처리로 노이즈 제거
-# gray = cv2.medianBlur(gray, 10)
-
-# print(pytesseract.image_to_string(gray, config=config))
-
-# cv2.imshow('gray', gray)
-# cv2.waitKey(0)
-
-
-# print(" =============== 음영 처리 ================== ")
-# img_gray=cv2.imread('test.png', cv2.IMREAD_GRAYSCALE)
-
-# cv2.imshow('gray', img_gray)
-
-# print(pytesseract.image_to_string(img_gray, config=config))
-# cv2.waitKey()
-
+# print(df_B.info())

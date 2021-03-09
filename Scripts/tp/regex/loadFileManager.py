@@ -17,6 +17,8 @@ from pptx import Presentation
 from docx import Document
 import csv
 import openpyxl
+from pdfminer.high_level import extract_pages
+from pdfminer.layout import LTTextContainer
 
 class loadFileManager:
     # 파일 이름, 확장자 분리
@@ -40,7 +42,7 @@ class loadFileManager:
     # 확장자에 맞는 read 함수로 매핑
     def read_file(self):
         result = self.read_function[self.ext](self)
-        return result 
+        return result
 
     # 읽을 수 있는 확장자인가 검사
     def check_ext(self):
@@ -58,31 +60,38 @@ class loadFileManager:
     # pdf, hwp, ppt, docx, ....
 
     def read_pdf(self):
-        rsrcmgr = PDFResourceManager()
-        retstr = StringIO()
-        codec = 'utf-8'
-        laparams = LAParams()
+        # rsrcmgr = PDFResourceManager()
+        # retstr = StringIO()
+        # codec = 'utf-8'
+        # laparams = LAParams()
         
-        # f = open('./out.html', 'wb')
-        # device = HTMLConverter(rsrcmgr, f, codec=codec, laparams=laparams)
-        device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+        for page_layout in extract_pages(self.path):
+            print("#################### page 구분선")
+            for element in page_layout:
+                if isinstance(element, LTTextContainer):
+                    print(element.get_text())
         
-        with open(self.path, 'rb') as fp:
-            interpreter = PDFPageInterpreter(rsrcmgr, device)
-            password = ""
-            maxpages = 0 #is for all
-            caching = True
-            pagenos=set()
+        # # f = open('./out.html', 'wb')
+        # # device = HTMLConverter(rsrcmgr, f, codec=codec, laparams=laparams)
+        # device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+        
+        # with open(self.path, 'rb') as fp:
+        #     interpreter = PDFPageInterpreter(rsrcmgr, device)
+        #     # password = ""
+        #     maxpages = 0 #is for all
+        #     # caching = True
+        #     pagenos=set()
             
-            for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,caching=caching, check_extractable=True):
-                interpreter.process_page(page)
+        #     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, check_extractable=True):
+        #         interpreter.process_page(page)
             
-            str = retstr.getvalue()
+        #     # 이건 전체 페이지 전부다 리턴할때 쓰는거
+        #     str = retstr.getvalue()
 
-            fp.close()
+        #     fp.close()
         
-        device.close()
-        retstr.close()
+        # device.close()
+        # retstr.close()
         # f.close()
         
         return str
@@ -182,6 +191,7 @@ class loadFileManager:
         # 차원축소2
         answer2 = sum(all_sheet_value, [])
 
+        # 리스트 강제로 str로 함 ㅠ
         return str(answer2)
         
 
