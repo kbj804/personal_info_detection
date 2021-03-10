@@ -7,7 +7,9 @@ origin_regex = regexManager()
 # file = loadFileManager("csv_sample.csv")
 file = loadFileManager("pdf_sample2.pdf")
 
-# print(file.data)
+
+print(file.data[0])
+print(file.path)
 
 
 

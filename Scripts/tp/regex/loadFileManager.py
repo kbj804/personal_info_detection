@@ -1,5 +1,5 @@
 '''
-pip install pdfminer.six
+pip install pdfminer.six  # https://pdfminersix.readthedocs.io/en/latest/tutorial/extract_pages.html
 pip install 'olefile'  or '-U olefile'
 pip install python-pptx
 pip install python-docx
@@ -60,41 +60,48 @@ class loadFileManager:
     # pdf, hwp, ppt, docx, ....
 
     def read_pdf(self):
-        # rsrcmgr = PDFResourceManager()
-        # retstr = StringIO()
-        # codec = 'utf-8'
-        # laparams = LAParams()
-        
-        for page_layout in extract_pages(self.path):
-            print("#################### page 구분선")
+        # using pdfminer.six  / No pdfminer
+        result = {}
+        for i, page_layout in enumerate(extract_pages(self.path)):
+            page_contents=''
             for element in page_layout:
                 if isinstance(element, LTTextContainer):
-                    print(element.get_text())
+                    page_contents += element.get_text()
+            result[i] = page_contents
         
-        # # f = open('./out.html', 'wb')
-        # # device = HTMLConverter(rsrcmgr, f, codec=codec, laparams=laparams)
-        # device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+        return result
         
-        # with open(self.path, 'rb') as fp:
-        #     interpreter = PDFPageInterpreter(rsrcmgr, device)
-        #     # password = ""
-        #     maxpages = 0 #is for all
-        #     # caching = True
-        #     pagenos=set()
-            
-        #     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, check_extractable=True):
-        #         interpreter.process_page(page)
-            
-        #     # 이건 전체 페이지 전부다 리턴할때 쓰는거
-        #     str = retstr.getvalue()
 
-        #     fp.close()
+        # pdf 추출하는 다른 방법 (pdfminer)
+        '''rsrcmgr = PDFResourceManager()
+        retstr = StringIO()
+        codec = 'utf-8'
+        laparams = LAParams()
+        # f = open('./out.html', 'wb')
+        # device = HTMLConverter(rsrcmgr, f, codec=codec, laparams=laparams)
+        device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
         
-        # device.close()
-        # retstr.close()
-        # f.close()
+        with open(self.path, 'rb') as fp:
+            interpreter = PDFPageInterpreter(rsrcmgr, device)
+            # password = ""
+            maxpages = 0 #is for all
+            # caching = True
+            pagenos=set()
+            
+            for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, check_extractable=True):
+                interpreter.process_page(page)
+            
+            # 이건 전체 페이지 전부다 리턴할때 쓰는거
+            str = retstr.getvalue()
+
+            fp.close()
         
+        device.close()
+        retstr.close()
+        f.close()
+    
         return str
+        '''
 
     def read_hwp(self):
         f = olefile.OleFileIO(self.path)
