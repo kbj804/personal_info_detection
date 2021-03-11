@@ -5,11 +5,11 @@ import time
 # print(os.path.abspath(os.path.dirname(__file__)))
 from Scripts.tp.regex.regularExpression_configs import RegexConfigs
 
-class regexManager:
+class regexDictionaryManager:
     def __init__(self):
         # new regex Dictionary
         self.dictionary={}
-        
+    
         origin_regex = RegexConfigs()
         self.origin_Dictionary = origin_regex.preComfile_dic
     
@@ -57,4 +57,25 @@ class regexManager:
             
             self.extract_csv(result, keys[i])
             print("{} is Success Extract".format(keys[i]))
+    
+    # 모든 정규식 다 돌림
+    def get_all_regex(self, data):
+        keys = list(self.origin_Dictionary.keys())
+        total_count = 0
+        regex_name_list = []
+        regex_result_list = []
+        for i in range(0, len(keys)):
+            result = ''
+            sub_count=0
+            for regex in self.origin_Dictionary[keys[i]].findall(data):
+                # result += str(regex[0]) + '\n'
+                regex_result_list.append(regex[0])
+                sub_count+=1
+            if sub_count > 0:
+                total_count += sub_count
+                regex_name_list.append(keys[i])
+                
+                # print(f"{keys[i]}[{sub_count}]: {result}")
 
+        
+        return regex_name_list, total_count, regex_result_list

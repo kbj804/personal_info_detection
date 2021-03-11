@@ -1,15 +1,31 @@
-from Scripts.tp.regex.regexDictionaryManager import regexManager
+from Scripts.tp.regex.regexDictionaryManager import regexDictionaryManager
 from Scripts.tp.regex.loadFileManager import loadFileManager
+from Scripts.tp.nlp.kiwi_morp import kiwi_dictionary_n_fuction
 
+origin_regex = regexDictionaryManager()
 
-origin_regex = regexManager()
 
 # file = loadFileManager("csv_sample.csv")
 file = loadFileManager("pdf_sample2.pdf")
+# print(file.data[0])
+# print(file.path)
+# origin_regex.get_all_regex(file.data[0])
+# origin_regex.get_all_regex(file.data[1])
+# origin_regex.get_all_regex(file.data[2])
 
+kwd = kiwi_dictionary_n_fuction(r'./tesseract_Project/Scripts/tp/nlp/dic.txt')
 
-print(file.data[0])
-print(file.path)
+keys = list(file.data.keys())
+for i in range(0, len(keys)):
+    print(f"############# PAGE: {i+1} #################")
+    # regex name, count, regex_ruslt_list
+    rn, c, rrl= origin_regex.get_all_regex(file.data[i])
+    print(kwd.get_keyword(file.data[i]))
+    # print(kwd.k_morphs(file.data[i]))
+    print(rn)
+    print(c)
+    print(rrl)
+
 
 
 

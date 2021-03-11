@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-
+# PDF 이미지 파일 읽어서 Page별로 OCR 후 리턴 -> 리턴값은 json
 # Import libraries 
 import pytesseract
 import json

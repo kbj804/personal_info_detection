@@ -68,6 +68,10 @@ class kiwi_dictionary_n_fuction:
             token_list.append(i[0])
         return token_list
 
+    def get_keyword(self, sen):
+            _, _, _, _, kwd_list = self.generate_morp_word(sen, 1)
+            return ' '.join(kwd_list)
+
     # 문장에서 형태소를 뽑아냄
     def generate_morp_word(self, sentence, analyze_num):
         try:
@@ -77,11 +81,13 @@ class kiwi_dictionary_n_fuction:
             morp_vv_list=[]
             morp_not_josa_list=[]
             nn=[]
+            morp_key_list=[]
             for i in range(0, analyze_num):
                 morp_word = ''
                 morp_nn=''  
                 morp_vv=''
                 morp_not_josa=''
+                morp_key=''
                 
                 for word in result[i][0]:
                     morp_word += word[0]
@@ -97,14 +103,18 @@ class kiwi_dictionary_n_fuction:
                         elif word[1] in ['VV','VA','VX','VCP','VCN']:
                             morp_vv += word[0]
                             morp_vv += ' '
+                        elif word[1] in ['NP']:
+                            morp_key += word[0]
+                            morp_key += ' '
                     else:
                         pass
                 morp_word_list.append(morp_word)
                 morp_nn_list.append(morp_nn)
                 morp_vv_list.append(morp_vv)
                 morp_not_josa_list.append(morp_not_josa)
+                morp_key_list.append(morp_key)
 
-            return morp_word_list, nn, morp_vv_list, morp_not_josa_list
+            return morp_word_list, nn, morp_vv_list, morp_not_josa_list, morp_key_list
 
         except Exception as e:
             print(e)

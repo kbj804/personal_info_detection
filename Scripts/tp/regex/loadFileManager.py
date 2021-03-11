@@ -6,12 +6,12 @@ pip install python-docx
 pip install openpyxl
 '''
 import os
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import HTMLConverter
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
-from io import StringIO
+# from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+# from pdfminer.converter import HTMLConverter
+# from pdfminer.converter import TextConverter
+# from pdfminer.layout import LAParams
+# from pdfminer.pdfpage import PDFPage
+# from io import StringIO
 import olefile
 from pptx import Presentation
 from docx import Document
