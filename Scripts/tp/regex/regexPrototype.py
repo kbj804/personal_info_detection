@@ -1,6 +1,8 @@
+from Scripts.tp.regex.keyword_extract import KeywordExtract
 from Scripts.tp.regex.regexDictionaryManager import regexDictionaryManager
 from Scripts.tp.regex.loadFileManager import loadFileManager
 from Scripts.tp.nlp.kiwi_morp import kiwi_dictionary_n_fuction
+from Scripts.tp.regex.keyword_extract import KeywordExtract
 
 origin_regex = regexDictionaryManager()
 
@@ -13,20 +15,37 @@ file = loadFileManager("pdf_sample2.pdf")
 # origin_regex.get_all_regex(file.data[1])
 # origin_regex.get_all_regex(file.data[2])
 
-kwd = kiwi_dictionary_n_fuction(r'./tesseract_Project/Scripts/tp/nlp/dic.txt')
+# kwd = kiwi_dictionary_n_fuction(r'./tesseract_Project/Scripts/tp/nlp/dic.txt')
 
-keys = list(file.data.keys())
-for i in range(0, len(keys)):
-    print(f"############# PAGE: {i+1} #################")
+ke = KeywordExtract(r'./tesseract_Project/Scripts/tp/nlp/dic.txt')
+pages = list(file.data.keys())
+ke.keywords.insert(0, "Regex Count")
+row = ','.join(ke.keywords)
+
+for page in range(0, len(pages)):
+    print(f"############# PAGE: {page+1} #################")
     # regex name, count, regex_ruslt_list
-    rn, c, rrl= origin_regex.get_all_regex(file.data[i])
-    print(kwd.get_keyword(file.data[i]))
+    rn, c, rrl= origin_regex.get_all_regex(file.data[page])
+    
+    row += '\n' + str(c)
+
+
+    for i in range(0, len(ke.keywords)-1):
+        row += ','
+        if ke.keyword_dictionary[i].search(file.data[page]):
+            # print(ke.keyword_dictionary[i].search(file.data[page]))
+            row += '1'
+        else:
+            row += '0'
+
+    # print(kwd.get_keyword(file.data[i]))
     # print(kwd.k_morphs(file.data[i]))
-    print(rn)
-    print(c)
-    print(rrl)
+    print(f"Regex Name : {rn}")
+    print(f"Regex Count : {c}")
+    print(f"Regex Result List : {rrl}")
 
-
+print(row)
+origin_regex.extract_csv(row, "result")
 
 
 # a = regexManager()

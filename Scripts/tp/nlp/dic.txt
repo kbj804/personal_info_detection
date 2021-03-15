@@ -11,3 +11,10 @@
 운전면허증	NNP	3.0
 건강보험증	NNP	3.0
 건강보험번호	NNP	3.0
+유사도	NNP	3.0
+이동건	NNP	3.0
+최호진	NNP	3.0
+언어모델	NNP	3.0
+char-rnn	NNP	3.0
+참고 문헌	NNP	3.0
+WiseQA	NNP	3.0
