@@ -185,5 +185,6 @@ class RegexConfigs:
         'DocumentFile':docRegex
     }
 
+
     # Dictionary로 KEY List 생성
     preComfile_list = list(preComfile_dic.keys())
