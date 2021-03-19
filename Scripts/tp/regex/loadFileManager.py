@@ -38,7 +38,7 @@ class loadFileManager:
         else:
             print("여기론 안와")
             pass
-    
+            
     # 확장자에 맞는 read 함수로 매핑
     def read_file(self):
         result = self.read_function[self.ext](self)

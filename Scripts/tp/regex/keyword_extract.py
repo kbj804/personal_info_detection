@@ -3,7 +3,8 @@ import re
 
 class KeywordExtract:
     def __init__(self, keyword_path) -> None:
-        self.keywords=[]
+        # 
+        self.keywords=['Regex Count']
         with open(keyword_path, mode="r", encoding='UTF8') as kwd_file:
             for kwd in kwd_file:
                 # preprocessing for reducing tail string
