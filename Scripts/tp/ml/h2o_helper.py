@@ -27,8 +27,12 @@ class H2oClass:
 
         self.model_path = None
 
-    def load_data(self, path):
+    def load_csv_to_hdf(self, path):
         df = pd.read_csv(path, sep=',')
+        hf = h2o.H2OFrame(df)
+        return hf
+
+    def df_to_hf(self, df):
         hf = h2o.H2OFrame(df)
         return hf
 
@@ -67,7 +71,7 @@ class H2oClass:
         self.preds = self.aml.leader.predict(data)
 
         # self.test[self.y].cbind(self.preds)
-#%%  
+'''#%%  
 h = H2oClass()
 
 #%%
@@ -111,4 +115,4 @@ model = h.load_model(r"D:\\model\\GBM_1_AutoML_20210323_104837")
 
 #%%
 ppp = model.predict(pre)
-ppp
+ppp'''

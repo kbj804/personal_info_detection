@@ -1,3 +1,4 @@
+# 
 from Scripts.tp.regex.keyword_extract import KeywordExtract
 from Scripts.tp.regex.regexDictionaryManager import regexDictionaryManager
 from Scripts.tp.regex.loadFileManager import loadFileManager
@@ -7,21 +8,26 @@ import pandas as pd
 
 class GenerateData:
     def __init__(self) -> None:
-        self.origin_regex_dic = regexDictionaryManager()
-        self.default_model_df = pd.read_csv(r'./regex_result/model.csv', encoding='UTF-8')
-        self.kwd = KeywordExtract(r'./tesseract_Project/Scripts/tp/nlp/dic.txt')
+        self.default_model_path = './regex_result/model.csv'
 
+        self.origin_regex_dic = regexDictionaryManager()
+        
+        self.kwd = KeywordExtract(r'D:\\Project\\tesseract\\tesseract_Project\Scripts\\tp\\nlp\\dic.txt')
+
+    def set_default_datafram(self):
+        self.default_model_df = pd.read_csv(self.default_model_path, encoding='UTF-8')
 
     def update_model_df(self, df_data):
         # print(self.default_model_df)
         # print(df_data)
         c_df = pd.concat([self.default_model_df, df_data]).reset_index(drop=True)
-        c_df.to_csv(r'./regex_result/model.csv', sep=',', na_rep='NaN', encoding='UTF-8', index=False)
+        c_df.to_csv(self.default_model_path, sep=',', na_rep='NaN', encoding='UTF-8', index=False)
         return c_df
 
 
     # need generate file path
-    def generate_df(self, file_path):
+    def file_to_dataframe(self, file_path):
+        # file type: Dictionary
         file = loadFileManager(file_path)
         pages = list(file.data.keys())
 
@@ -47,8 +53,9 @@ class GenerateData:
         df = pd.DataFrame(data, columns=self.kwd.keywords)
         return df
 
-g = GenerateData()
-a = g.generate_df("pdf_sample2.pdf")
-b = g.update_model_df(a)
-print(b)
+# g = GenerateData()
+# a = g.file_to_dataframe("pdf_sample2.pdf")
+# print(a)
+# b = g.update_model_df(a)
+# print(b)
 
