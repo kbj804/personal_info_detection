@@ -46,7 +46,7 @@ class regexDictionaryManager(RegexConfigs):
     # string file을 csv로 추출
     def extract_csv(self, data, filename):
         with open("./regex_result/" + filename + '.csv', "w") as file:
-            # file.write(filename + '\n' + data)
+            file.write(filename + '\n' + data)
             file.write(data)
             file.close()
 

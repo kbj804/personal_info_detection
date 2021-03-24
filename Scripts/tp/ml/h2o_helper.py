@@ -57,13 +57,14 @@ class H2oClass(Configs):
 
         # Train Model
         aml.train(x= self.x, y=self.y, training_frame=self.train)
-
+        
+        # aml.leaderboard
         # Select Model in autoML
-        self.model = aml.leaderboard
-        self.model.head(rows=self.model.nrows)
+        return aml.leader
+        # self.model.head(rows=self.model.nrows)
 
-    def save_md(self):
-        self.md_path = h2o.save_model(model=self.model, path=self.model_path, force=True)
+    def save_md(self, model):
+        self.md_path = h2o.save_model(model=model, path=self.model_path, force=True)
 
     def load_md(self, model_path):
         return h2o.load_model(model_path)
@@ -78,16 +79,19 @@ class H2oClass(Configs):
 h = H2oClass()
 
 #%%
-data = h.load_data("h2o_sample.csv")
-
+data = h.load_csv_to_hf("h2o_sample.csv")
+data
 #%%
 h.split_data(data)
 
 #%%
-h.train_model()
+ml = h.train_model()
+ml
 
 #%%
-h.save_model()
+ml.leader
+#%%
+h.save_md(ml)
 
 #%%
 h.predict(h.test)

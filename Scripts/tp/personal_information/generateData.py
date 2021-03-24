@@ -55,10 +55,10 @@ class GenerateData(Configs):
         df = pd.DataFrame(data, columns=self.kwd.keywords)
         return df
 
-g = GenerateData()
-df = g.file_to_dataframe("pdf_sample.pdf")
-# df.to_csv("test.csv",sep=',',index=False)
-print(df)
+# g = GenerateData()
+# df = g.file_to_dataframe("pdf_sample.pdf")
+# # df.to_csv("test.csv",sep=',',index=False)
+# print(df)
 # b = g.update_model_df(a)
 # print(b)
 
