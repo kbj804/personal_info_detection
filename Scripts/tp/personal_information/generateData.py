@@ -1,27 +1,29 @@
 # 
+from Scripts.tp.personal_information.configs import Configs
 from Scripts.tp.regex.keyword_extract import KeywordExtract
 from Scripts.tp.regex.regexDictionaryManager import regexDictionaryManager
 from Scripts.tp.regex.loadFileManager import loadFileManager
 from Scripts.tp.regex.keyword_extract import KeywordExtract
+from Scripts.tp.personal_information.configs import Configs
 import pandas as pd
 
 
-class GenerateData:
+class GenerateData(Configs):
     def __init__(self) -> None:
-        self.default_model_path = './regex_result/model.csv'
-
+        super().__init__()
+        # self.default_csv_model_path = './regex_result/model.csv'
         self.origin_regex_dic = regexDictionaryManager()
-        
-        self.kwd = KeywordExtract(r'D:\\Project\\tesseract\\tesseract_Project\Scripts\\tp\\nlp\\dic.txt')
+        self.kwd = KeywordExtract(self.keyword_path)
+        # self.kwd = KeywordExtract(r'D:\\Project\\tesseract\\tesseract_Project\Scripts\\tp\\nlp\\dic.txt')
 
     def set_default_datafram(self):
-        self.default_model_df = pd.read_csv(self.default_model_path, encoding='UTF-8')
+        self.default_model_df = pd.read_csv(self.default_csv_model_path, encoding='UTF-8')
 
     def update_model_df(self, df_data):
         # print(self.default_model_df)
         # print(df_data)
         c_df = pd.concat([self.default_model_df, df_data]).reset_index(drop=True)
-        c_df.to_csv(self.default_model_path, sep=',', na_rep='NaN', encoding='UTF-8', index=False)
+        c_df.to_csv(self.default_csv_model_path, sep=',', na_rep='NaN', encoding='UTF-8', index=False)
         return c_df
 
 
@@ -53,9 +55,10 @@ class GenerateData:
         df = pd.DataFrame(data, columns=self.kwd.keywords)
         return df
 
-# g = GenerateData()
-# a = g.file_to_dataframe("pdf_sample2.pdf")
-# print(a)
+g = GenerateData()
+df = g.file_to_dataframe("pdf_sample.pdf")
+# df.to_csv("test.csv",sep=',',index=False)
+print(df)
 # b = g.update_model_df(a)
 # print(b)
 

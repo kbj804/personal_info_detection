@@ -1,10 +1,11 @@
-
 import re
 
 class KeywordExtract:
     def __init__(self, keyword_path) -> None:
         # 
         self.keywords=['Regex Count']
+        self.keyword_dictionary = {}
+
         with open(keyword_path, mode="r", encoding='UTF8') as kwd_file:
             for kwd in kwd_file:
                 # preprocessing for reducing tail string
@@ -12,8 +13,7 @@ class KeywordExtract:
                 word = kwd[:index]
 
                 self.keywords.append(word)
-
-        self.keyword_dictionary = {}
+        
         for i, kwd in enumerate(self.keywords):
             self.keyword_dictionary[i] = re.compile(kwd)
 

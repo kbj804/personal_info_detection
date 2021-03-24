@@ -12,5 +12,8 @@ model = m.load_model(r"D:\\model\\GBM_1_AutoML_20210323_104837")
 
 # %%
 hdf = m.df_to_hf(gdf)
+# drop row(NaN)
+hdf = hdf.na_omit()
+
 # %%
 preds = model.predict(hdf)

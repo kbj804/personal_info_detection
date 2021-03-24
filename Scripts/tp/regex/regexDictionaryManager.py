@@ -5,13 +5,16 @@ import time
 # print(os.path.abspath(os.path.dirname(__file__)))
 from Scripts.tp.regex.regularExpression_configs import RegexConfigs
 
-class regexDictionaryManager:
+class regexDictionaryManager(RegexConfigs):
     def __init__(self):
+        super().__init__()
+
         # new regex Dictionary
         self.dictionary={}
     
-        origin_regex = RegexConfigs()
-        self.origin_Dictionary = origin_regex.preComfile_dic
+        # origin_regex = RegexConfigs()
+        # self.origin_Dictionary = origin_regex.preComfile_dic
+        self.origin_Dictionary = self.preComfile_dic
     
     # 키값 있는지 없는지 검사
     def check_key(self, key):
@@ -40,7 +43,7 @@ class regexDictionaryManager:
         print("key list = {}".format(keys))
         print(self.dictionary)
 
-    # csv로 추출
+    # string file을 csv로 추출
     def extract_csv(self, data, filename):
         with open("./regex_result/" + filename + '.csv', "w") as file:
             # file.write(filename + '\n' + data)
@@ -66,7 +69,7 @@ class regexDictionaryManager:
         regex_name_list = []
         regex_result_list = []
         for i in range(0, len(keys)):
-            result = ''
+            # result = ''
             sub_count=0
             for regex in self.origin_Dictionary[keys[i]].findall(data):
                 # result += str(regex[0]) + '\n'

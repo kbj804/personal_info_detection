@@ -10,10 +10,12 @@ pip install -f http://h2o-release.s3.amazonaws.com/h2o/latest_stable_Py.html h2o
 import h2o
 from h2o.automl import H2OAutoML
 from h2o.h2o import load_model
+from Scripts.tp.personal_information.configs import Configs
 import pandas as pd
 
-class H2oClass:
+class H2oClass(Configs):
     def __init__(self):
+        super().__init__()
         # Start H2O Server
         h2o.init()
         self.train=[]
@@ -22,12 +24,12 @@ class H2oClass:
         self.x = None
         self.y = None
 
-        self.aml = None
+        self.model = None
         self.preds = None
 
-        self.model_path = None
+        self.md_path = None
 
-    def load_csv_to_hdf(self, path):
+    def load_csv_to_hf(self, path):
         df = pd.read_csv(path, sep=',')
         hf = h2o.H2OFrame(df)
         return hf
@@ -36,8 +38,8 @@ class H2oClass:
         hf = h2o.H2OFrame(df)
         return hf
 
-    def split_data(self, data):
-        self.train, self.test = data.split_frame(ratios = [.8], seed = 1234)
+    def split_data(self, h_data):
+        self.train, self.test = h_data.split_frame(ratios = [.8], seed = 1234)
 
         self.x = self.train.columns
         self.y = "y"
@@ -49,26 +51,27 @@ class H2oClass:
 
     def train_model(self):
         # Setting parameter
-        self.aml = H2OAutoML(max_models=3
+        aml = H2OAutoML(max_models=3
                         , seed=1
                     )
 
         # Train Model
-        self.aml.train(x= self.x, y=self.y, training_frame=self.train)
+        aml.train(x= self.x, y=self.y, training_frame=self.train)
 
         # Select Model in autoML
-        lb = self.aml.leaderboard
-        lb.head(rows=lb.nrows)
+        self.model = aml.leaderboard
+        self.model.head(rows=self.model.nrows)
 
-    def save_model(self):
-        self.model_path = h2o.save_model(model=self.aml.leader, path=r"/model", force=True)
+    def save_md(self):
+        self.md_path = h2o.save_model(model=self.model, path=self.model_path, force=True)
 
-    def load_model(self, model_path):
+    def load_md(self, model_path):
         return h2o.load_model(model_path)
 
+    # 이거 없이 그냥 model.predict(hdf) 사용해도 됨
     def predict(self, data):
         # self.preds = self.aml.predict(data)
-        self.preds = self.aml.leader.predict(data)
+        self.preds = self.model.predict(data)
 
         # self.test[self.y].cbind(self.preds)
 '''#%%  
